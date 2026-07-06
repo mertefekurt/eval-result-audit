@@ -1,71 +1,46 @@
-# eval-result-audit
+# Eval Result Audit
 
-`eval-result-audit` is a small local CLI that audit LLM evaluation result exports for gaps, weak judges, and missing rationales.
+<p align="center">
+  <img src="assets/readme-cover.svg" alt="Eval Result Audit cover" width="100%" />
+</p>
 
-## Why it is useful
+![stack](https://img.shields.io/badge/stack-Python-4b5563?style=flat-square) ![python](https://img.shields.io/badge/python-3.11-2563eb?style=flat-square) ![license](https://img.shields.io/badge/license-MIT-16a34a?style=flat-square) ![ci](https://img.shields.io/badge/ci-GitHub%20Actions-dc2626?style=flat-square)
 
-Eval results become hard to trust when cases lack rationales or judge metadata. This CLI catches gaps in exported eval runs.
+Audit LLM evaluation result exports for gaps, weak judges, and missing rationales.
 
-## Key features
+## The short version
 
-- reads text, JSON, JSONL, or CSV inputs
-- returns Markdown or JSON reports
-- supports severity-based CI exit codes
-- keeps all checks deterministic and offline
-- includes focused rules for this project:
-- `unknown-judge`: judge identity is missing
-- `missing-rationale`: judge rationale is missing
-- `skipped-case`: eval case was skipped
+`eval-result-audit` is intentionally small: feed it a file, get deterministic findings, and decide whether the result should block a merge or just guide cleanup.
 
-## Installation
+## Rule surface
 
-```bash
-python -m pip install -e ".[dev]"
-```
+| Rule | Severity | What it catches |
+| --- | --- | --- |
+| `unknown-judge` | high | judge identity is missing |
+| `missing-rationale` | medium | judge rationale is missing |
+| `skipped-case` | low | eval case was skipped |
 
 ## Usage
 
 ```bash
+python -m pip install -e ".[dev]"
 eval-result-audit examples/sample.txt
-eval-result-audit examples/sample.txt --json
-eval-result-audit path/to/input.txt --fail-on medium --out report.md
-python -m eval_result_audit --help
+eval-result-audit examples/sample.txt --json --fail-on medium
 ```
 
-Example input:
+## Useful defaults
 
-```text
-case 42 score pass judge: unknown rationale: missing skipped false
-```
+| Option | Reason |
+| --- | --- |
+| `--json` | machine-readable output for scripts |
+| `--fail-on medium` | stricter CI gate when warnings matter |
+| `--format auto` | let the reader detect text, CSV, JSON, or JSONL |
 
-## CLI options
-
-```text
-eval-result-audit INPUT [--format auto|text|jsonl|csv|json] [--json]
-             [--fail-on low|medium|high] [--out PATH]
-```
-
-`INPUT` is any eval result JSONL, CSV, or notes. The tool exits with code `2` when findings meet the selected
-threshold, which makes it easy to use in GitHub Actions or release checks.
-
-## Workflow
-
-```mermaid
-flowchart LR
-    A[input file] --> B[format reader]
-    B --> C[project-specific rules]
-    C --> D[risk score]
-    D --> E[Markdown or JSON report]
-```
-
-## Tests
+## Local checks
 
 ```bash
+python -m pip install -e ".[dev]"
 ruff check .
 pytest
 python -m eval_result_audit --help
 ```
-
-## License
-
-MIT
