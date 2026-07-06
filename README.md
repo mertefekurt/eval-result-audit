@@ -4,33 +4,27 @@
 
 Audit LLM evaluation result exports for gaps, weak judges, and missing rationales.
 
-## The rule file is the product
+## Before the fix
 
-- `unknown-judge` (high): judge identity is missing. Fix: Record judge version, model, or rubric name..
-- `missing-rationale` (medium): judge rationale is missing. Fix: Store concise rationale for auditability..
-- `skipped-case` (low): eval case was skipped. Fix: Track skipped cases separately from passing cases..
+The sample fixture in `examples/` is the quickest way to see the check fire.
 
-Everything else in the repo exists to feed records into those checks and render the answer in a way a person can act on.
+## Decision points
 
-## Shell session
+| Signal | Level | What it flags | Fix direction |
+| --- | --- | --- | --- |
+| `unknown-judge` | high | judge identity is missing | Record judge version, model, or rubric name. |
+| `missing-rationale` | medium | judge rationale is missing | Store concise rationale for auditability. |
+| `skipped-case` | low | eval case was skipped | Track skipped cases separately from passing cases. |
+
+## Signal route
+
+![Workflow diagram](assets/readme-diagram.svg)
+
+## Fresh clone path
 
 ```bash
 git clone https://github.com/mertefekurt/eval-result-audit.git
 cd eval-result-audit
-python -m venv .venv
-source .venv/bin/activate
 python -m pip install -e ".[dev]"
 eval-result-audit examples/sample.txt
-eval-result-audit examples/sample.txt --json
-```
-
-## Repository shape
-
-```text
-.github/        CI workflow
-examples/       sample inputs
-src/            package source
-tests/          test coverage
-.gitignore      project file
-pyproject.toml  package metadata
 ```
