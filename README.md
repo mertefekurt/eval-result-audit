@@ -1,46 +1,36 @@
 # Eval Result Audit
 
-<p align="center">
-  <img src="assets/readme-cover.svg" alt="Eval Result Audit cover" width="100%" />
-</p>
-
-![stack](https://img.shields.io/badge/stack-Python-4b5563?style=flat-square) ![python](https://img.shields.io/badge/python-3.11-2563eb?style=flat-square) ![license](https://img.shields.io/badge/license-MIT-16a34a?style=flat-square) ![ci](https://img.shields.io/badge/ci-GitHub%20Actions-dc2626?style=flat-square)
+![Eval Result Audit cover](assets/readme-cover.svg)
 
 Audit LLM evaluation result exports for gaps, weak judges, and missing rationales.
 
-## The short version
+## The rule file is the product
 
-`eval-result-audit` is intentionally small: feed it a file, get deterministic findings, and decide whether the result should block a merge or just guide cleanup.
+- `unknown-judge` (high): judge identity is missing. Fix: Record judge version, model, or rubric name..
+- `missing-rationale` (medium): judge rationale is missing. Fix: Store concise rationale for auditability..
+- `skipped-case` (low): eval case was skipped. Fix: Track skipped cases separately from passing cases..
 
-## Rule surface
+Everything else in the repo exists to feed records into those checks and render the answer in a way a person can act on.
 
-| Rule | Severity | What it catches |
-| --- | --- | --- |
-| `unknown-judge` | high | judge identity is missing |
-| `missing-rationale` | medium | judge rationale is missing |
-| `skipped-case` | low | eval case was skipped |
-
-## Usage
+## Shell session
 
 ```bash
+git clone https://github.com/mertefekurt/eval-result-audit.git
+cd eval-result-audit
+python -m venv .venv
+source .venv/bin/activate
 python -m pip install -e ".[dev]"
 eval-result-audit examples/sample.txt
-eval-result-audit examples/sample.txt --json --fail-on medium
+eval-result-audit examples/sample.txt --json
 ```
 
-## Useful defaults
+## Repository shape
 
-| Option | Reason |
-| --- | --- |
-| `--json` | machine-readable output for scripts |
-| `--fail-on medium` | stricter CI gate when warnings matter |
-| `--format auto` | let the reader detect text, CSV, JSON, or JSONL |
-
-## Local checks
-
-```bash
-python -m pip install -e ".[dev]"
-ruff check .
-pytest
-python -m eval_result_audit --help
+```text
+.github/        CI workflow
+examples/       sample inputs
+src/            package source
+tests/          test coverage
+.gitignore      project file
+pyproject.toml  package metadata
 ```
